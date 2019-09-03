@@ -138,10 +138,19 @@ int main(int argc, char **argv)
 	string file1 = loadFile(argv[1]);
 	string file2 = loadFile(argv[2]);
 
-	// Get the LCS of the two files and display it and its length
-	string lcs = getLCS(file1, file2);
-	cout << "The LCS of the two files is: " << lcs << "\n";
-	cout << "The length of the LCS is: " << lcs.length() << "\n";
+	if(file1.length() == 1 || file2.length() == 1)
+	{
+		cout << "One of the files has nothing in it and there is no need to perform LCS. \n";
+	}
+
+	else
+	{
+		// Get the LCS of the two files and display it and its length
+		string lcs = getLCS(file1, file2);
+		cout << "The LCS of the two files is: " << lcs << "\n";
+		cout << "The length of the LCS is: " << lcs.length() << "\n";
+	}
+
 
 	return 0;
 }
