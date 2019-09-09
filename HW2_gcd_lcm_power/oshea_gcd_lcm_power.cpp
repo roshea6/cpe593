@@ -5,7 +5,7 @@
 	 the greatest common denominato and least common multiple of the first two and
 	 powermod of all three
 
-	 cite:
+	 cite: Just the notes from class
 
 	 "I pledge my honor that I have abided by the Stevens Honor System"
 */
