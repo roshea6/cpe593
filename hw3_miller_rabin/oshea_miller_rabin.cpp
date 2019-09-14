@@ -20,9 +20,9 @@
 using namespace std;
 
 // Raise a to the power of b and then return the result of (a^b) mod r
-long powermod(long a, int b, int r)
+int powermod(int a, int b, int r)
 {
-	long prod = 1;
+	int prod = 1;
 
 	while(b > 0)
 	{
@@ -40,23 +40,30 @@ long powermod(long a, int b, int r)
 }
 
 // Returns whether a number is not prime or most likely prime
-bool millerRabin(long num, int trials)
+bool millerRabin(int num, int trials)
 {
+	// Return true for base case primes as they won't work with Miller Rabin
+	if(num == 2 || num == 3)
+	{
+		return true;
+	}
+
+	bool carmichael_check;
 	// Loop for number of trials
 	for(int i = 1; i <= trials; i ++)
 	{
+		carmichael_check = true;
 		// Generate random witness number between 2 and num - 2
-		// TODO: Fix random number generation
-		long a = 2 + (rand() % ((num - 1) - 2));
+		int a = 2 + (rand() % ((num - 1) - 2));
 		cout << "a = " << a << "\n";
 
-		long s = 0;
-		long d;
+		int s = 0;
+		int d;
 
 		// turn n-1 into binary and then split it into s and d based on its trailing 0s
-		string binary = bitset<64>(num-1).to_string();
+		string binary = bitset<32>(num-1).to_string();
 		cout << binary << "\n";
-		for(long j = binary.length(); j > 0; j--)
+		for(int j = binary.length(); j > 0; j--)
 		{
 			// If we hit a non zero then we are out of trailing 0s
 			if(binary[j-1] != '0')
@@ -76,24 +83,30 @@ bool millerRabin(long num, int trials)
 		cout << "cut binary = " << binary << "\n";
 
 		// Store the result in d
-		d = bitset<64>(binary).to_ulong();
+		d = bitset<32>(binary).to_ulong();
 
 		cout << "d = " << d << "\n";
 
 		// Use powermod to see if the number is most likely prime
-		long x = powermod(a, d, num);
+		int x = powermod(a, d, num);
+
+		cout << "x  = " << x << "\n";
 
 		// Check if result from powermod is good
-		if(x == 1 || x == num -1)
+		if(x == 1 || x == num - 1)
 		{
 			// Test passed continue through trials
 			continue;
 		}
 
 		// Bad result need to manually check
-		for(long k = 1; k < s -1; k++)
+		for(int j = 1; j <= s - 1; j++)
 		{
+			carmichael_check = true;
+
 			x = x*x % num;
+
+			cout << "second x  = " << x << "\n";
 
 			// Carmichael number found return false
 			if(x == 1)
@@ -104,9 +117,12 @@ bool millerRabin(long num, int trials)
 			// Number checks out continue with trials
 			if(x == num -1)
 			{
+				carmichael_check = false;
 				continue;
 			}
-
+		}
+		if(carmichael_check)
+		{
 			return false;
 		}
 	}
@@ -117,14 +133,12 @@ bool millerRabin(long num, int trials)
 int main(int argc, char *argv[])
 {
 	// Set seed for random numbers
-	srand(time(NULL));
+	srand(0);
 
 	// Get the number from the command line
-	long num_to_check = atoi(argv[1]);
+	int num_to_check = atoi(argv[1]);
 
-	cout << num_to_check << "\n";
-
-	bool check = millerRabin(num_to_check, 100);
+	bool check = millerRabin(num_to_check, 10);
 
 	if(check)
 	{
