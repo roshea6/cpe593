@@ -5,8 +5,7 @@
 	 it is a prime or a composite number
 
 	 cite: http://www.cplusplus.com/reference/cstdlib/rand/ for random numbers
-	 https://stackoverflow.com/questions/22746429/c-decimal-to-binary-converting
-	 	converting int to binary
+	 http://www.cplusplus.com/reference/bitset/bitset/	 converting int to binary
 	 http://www.cplusplus.com/reference/string/string/pop_back/ for string element pop
 
 	 "I pledge my honor that I have abided by the Stevens Honor System"
@@ -16,13 +15,14 @@
 #include <stdlib.h>     /* srand, rand */
 #include <bitset>
 #include <string>
+#include <time.h>
 
 using namespace std;
 
 // Raise a to the power of b and then return the result of (a^b) mod r
-int powermod(int a, int b, int r)
+long powermod(long a, int b, int r)
 {
-	int prod = 1;
+	long prod = 1;
 
 	while(b > 0)
 	{
@@ -40,23 +40,23 @@ int powermod(int a, int b, int r)
 }
 
 // Returns whether a number is not prime or most likely prime
-bool millerRabin(int num, int trials)
+bool millerRabin(long num, int trials)
 {
 	// Loop for number of trials
 	for(int i = 1; i <= trials; i ++)
 	{
 		// Generate random witness number between 2 and num - 2
 		// TODO: Fix random number generation
-		int a = 5; //(rand() % (num - 4)) + 2;
+		long a = 2 + (rand() % ((num - 1) - 2));
 		cout << "a = " << a << "\n";
 
-		int s = 0;
-		int d;
+		long s = 0;
+		long d;
 
 		// turn n-1 into binary and then split it into s and d based on its trailing 0s
-		string binary = bitset<32>(num-1).to_string();
+		string binary = bitset<64>(num-1).to_string();
 		cout << binary << "\n";
-		for(int j = binary.length(); j > 0; j--)
+		for(long j = binary.length(); j > 0; j--)
 		{
 			// If we hit a non zero then we are out of trailing 0s
 			if(binary[j-1] != '0')
@@ -76,12 +76,12 @@ bool millerRabin(int num, int trials)
 		cout << "cut binary = " << binary << "\n";
 
 		// Store the result in d
-		d = bitset<32>(binary).to_ulong();
+		d = bitset<64>(binary).to_ulong();
 
 		cout << "d = " << d << "\n";
 
 		// Use powermod to see if the number is most likely prime
-		int x = powermod(a, d, num);
+		long x = powermod(a, d, num);
 
 		// Check if result from powermod is good
 		if(x == 1 || x == num -1)
@@ -91,7 +91,7 @@ bool millerRabin(int num, int trials)
 		}
 
 		// Bad result need to manually check
-		for(int j = 1; j < s -1; j++)
+		for(long k = 1; k < s -1; k++)
 		{
 			x = x*x % num;
 
@@ -117,14 +117,14 @@ bool millerRabin(int num, int trials)
 int main(int argc, char *argv[])
 {
 	// Set seed for random numbers
-	srand(0);
+	srand(time(NULL));
 
 	// Get the number from the command line
-	int num_to_check = atoi(argv[1]);
+	long num_to_check = atoi(argv[1]);
 
 	cout << num_to_check << "\n";
 
-	bool check = millerRabin(num_to_check, 1);
+	bool check = millerRabin(num_to_check, 100);
 
 	if(check)
 	{
