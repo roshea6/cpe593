@@ -20,9 +20,9 @@
 using namespace std;
 
 // Raise a to the power of b and then return the result of (a^b) mod r
-int powermod(int a, int b, int r)
+long powermod(long a, int b, int r)
 {
-	int prod = 1;
+	long prod = 1;
 
 	while(b > 0)
 	{
@@ -42,6 +42,12 @@ int powermod(int a, int b, int r)
 // Returns whether a number is not prime or most likely prime
 bool millerRabin(int num, int trials)
 {
+	//Check if input is 1 because 1 is not prime
+	if(num == 1)
+	{
+		return false;
+	}
+
 	// Return true for base case primes as they won't work with Miller Rabin
 	if(num == 2 || num == 3)
 	{
@@ -54,15 +60,14 @@ bool millerRabin(int num, int trials)
 	{
 		carmichael_check = true;
 		// Generate random witness number between 2 and num - 2
-		int a = 2 + (rand() % ((num - 1) - 2));
-		cout << "a = " << a << "\n";
+		long a = 2 + (rand() % ((num - 1) - 2));
 
 		int s = 0;
-		int d;
+		long d;
 
 		// turn n-1 into binary and then split it into s and d based on its trailing 0s
-		string binary = bitset<32>(num-1).to_string();
-		cout << binary << "\n";
+		string binary = bitset<64>(num-1).to_string();
+
 		for(int j = binary.length(); j > 0; j--)
 		{
 			// If we hit a non zero then we are out of trailing 0s
@@ -79,18 +84,11 @@ bool millerRabin(int num, int trials)
 			}
 		}
 
-		cout << "s = " << s << "\n";
-		cout << "cut binary = " << binary << "\n";
-
 		// Store the result in d
-		d = bitset<32>(binary).to_ulong();
-
-		cout << "d = " << d << "\n";
+		d = bitset<64>(binary).to_ulong();
 
 		// Use powermod to see if the number is most likely prime
-		int x = powermod(a, d, num);
-
-		cout << "x  = " << x << "\n";
+		long x = powermod(a, d, num);
 
 		// Check if result from powermod is good
 		if(x == 1 || x == num - 1)
@@ -106,8 +104,6 @@ bool millerRabin(int num, int trials)
 
 			x = x*x % num;
 
-			cout << "second x  = " << x << "\n";
-
 			// Carmichael number found return false
 			if(x == 1)
 			{
@@ -118,7 +114,7 @@ bool millerRabin(int num, int trials)
 			if(x == num -1)
 			{
 				carmichael_check = false;
-				continue;
+				break;
 			}
 		}
 		if(carmichael_check)
@@ -136,9 +132,9 @@ int main(int argc, char *argv[])
 	srand(0);
 
 	// Get the number from the command line
-	int num_to_check = atoi(argv[1]);
+	long num_to_check = atoi(argv[1]);
 
-	bool check = millerRabin(num_to_check, 10);
+	bool check = millerRabin(num_to_check, 100);
 
 	if(check)
 	{
