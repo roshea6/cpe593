@@ -1,10 +1,12 @@
 /*
 	 Author: Ryan O'Shea
 
-	 Description: Reads in a arrays of number from a specified file and uses
+	 Description: Reads in arrays of number from a specified file and uses
 	 quicksort to sort them from least to greatest
 
-	 cite:
+	 cite: http://www.cplusplus.com/reference/algorithm/swap/ for swap Function
+	 Discussed weird edge cases with roomate Frank Lenge.
+
 
 	 "I pledge my honor that I have abided by the Stevens Honor System"
 */
@@ -13,6 +15,8 @@
 #include <fstream>
 #include <string>
 #include <algorithm>
+#include <stdlib.h>
+#include <time.h>
 
 using namespace std;
 
@@ -20,38 +24,42 @@ using namespace std;
 // array
 void quickSort(int * arr, int left, int right)
 {
-	// Check if array length is 1 or 0
-	if((right - left) < 2)
-	{
-		return;
-	}
-
-	// Pick a pivot (Change this to random pivot point)
-	int pivot = (arr[left] + arr[right])/2;
-
 	int i = left;
 	int j = right;
+	int pivot = arr[(left + (rand() % right))]; //Choose a random nuber in the array as the pivot point
 
-	while(i < j)
+	// Move i and j towards the pivot point while swapping values along the way
+	while(i <= j)
 	{
+		// Increment i until it hits a number on the left side greater than the pivot
 		while(arr[i] < pivot)
 		{
 			i++;
 		}
-
-		while(arr[j] >= pivot)
+		// Decrement j until it hits number on the right side less than the pivot
+		while(arr[j] > pivot)
 		{
 			j--;
 		}
 
-		if(i < j)
+		if(i <= j)
 		{
+			// Swap the values to their proper sides
 			swap(arr[i], arr[j]);
+
+			// Increment i and decrement j incase a number equal to the pivot was
+			// swapped so we don't get caught in an infinite loop
+			i++;
+			j--;
 		}
 	}
-	//i and j are now equal
-	quickSort(arr, left, i-1);
-	quickSort(arr, i, right);
+
+	// Call two new quicksorts on the new unsorted portions of the array
+	if(left < j)
+		quickSort(arr, left, j);
+	if(i < right)
+		quickSort(arr, i, right);
+
 }
 
 // Function that returns the contents of the specified filename as an integer array
@@ -111,10 +119,12 @@ void loadAndSort(string filename)
 
 int main(int argc, char **argv)
 {
-	 string file_name = argv[1];
-	 int unsorted_arr;
+	//Generate random seed based off current time
+	srand(time(NULL));
+	string file_name = "hw2a.dat";
+	int unsorted_arr;
 
-	 loadAndSort(file_name);
+	loadAndSort(file_name);
 
-	 return 0;
+	return 0;
 }
