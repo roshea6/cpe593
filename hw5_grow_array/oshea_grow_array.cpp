@@ -209,7 +209,7 @@ public:
 	{
 		for(int i = 0; i < used; i++)
 		{
-			cout << data[i].x << " " << data[i].y << "\n";
+			cout << "(" << data[i].x << ", " << data[i].y << ") ";
 		}
 		cout << "\n";
 	}
@@ -242,6 +242,7 @@ void getMaxAndMin(double* x_min, double* x_max, double* y_min, double* y_max)
 	}
 	file.close();
 }
+
 
 int main(int argc, char **argv)
 {
@@ -310,16 +311,42 @@ int main(int argc, char **argv)
 
 	Point p;
 
-	for(int i = 0; i < 8; i++)
-	{
-		for(int j = 0; j < 8; j++)
-		{
-			p.x = i;
-			p.y = j;
+	// for(int i = 0; i < 8; i++)
+	// {
+	// 	for(int j = 0; j < 8; j++)
+	// 	{
+	// 		p.x = i;
+	// 		p.y = j;
+	//
+	// 		rect[i][j].addStart(p);
+	// 	}
+	// }
+	//
+	// for(int i = 0; i < 8; i++)
+	// {
+	// 	for(int j = 0; j < 8; j++)
+	// 	{
+	// 		cout << "Box (" << i << ", " << j << "): ";
+	//
+	// 		rect[i][j].displayData();
+	// 	}
+	// }
 
-			rect[i][j].addStart(p);
-		}
+	fstream file;
+	file.open("convexhullpoints.dat");
+
+	// Sort the points into their proper GrowArrays
+	while(file >> p.x >> p.y)
+	{
+		int i = ((p.y - *y_min)/(y_range))*(8-1);
+		int j = ((p.x - *x_min)/((x_range))*(8-1));
+
+		cout << p.x << ", " << p.y << " placed in box: (" << i << ", " << j << ") \n";
+
+		rect[i][j].addEnd(p);
 	}
+
+	file.close();
 
 	for(int i = 0; i < 8; i++)
 	{
@@ -330,5 +357,31 @@ int main(int argc, char **argv)
 			rect[i][j].displayData();
 		}
 	}
+
+	// Display max and min
+	cout << "X min = " << *x_min << "		X max = " << *x_max << "\n";
+	cout << "Y min = " << *y_min << "		Y max = " << *y_max << "\n";
+
+	// Display perimeter arrays
+	for(int i = 0; i < 8; i++)
+	{
+		for(int j = 0; j < 8; j++)
+		{
+			// First or last row
+			if(i == 0 or i == 7)
+			{
+				cout << "Row: " << i << "\n";
+				rect[i][j].displayData();
+			}
+
+			// First or last column
+			else if(j == 0 or j == 7)
+			{
+				cout << "Column: " << j << "\n";
+				rect[i][j].displayData();
+			}
+		}
+	}
+
 
 }
