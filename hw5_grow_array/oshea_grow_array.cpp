@@ -77,7 +77,6 @@ public:
 		// If we've filled the capacity of the array
 		if(used == capacity)
 		{
-			cout << "capacity has grown \n";
 			T* old = data; // Save old data
 			capacity *= 2;
 			data = new T[capacity];
@@ -210,7 +209,7 @@ public:
 	{
 		for(int i = 0; i < used; i++)
 		{
-			cout << data[i] << " ";
+			cout << data[i].x << " " << data[i].y << "\n";
 		}
 		cout << "\n";
 	}
@@ -225,13 +224,13 @@ public:
 };
 
 // Gets the minimum and maximum x and y valuesand store them in passed in locations
-void getMaxAndMin(float* x_min, float* x_max, float* y_min, float* y_max)
+void getMaxAndMin(double* x_min, double* x_max, double* y_min, double* y_max)
 {
 	fstream file;
 	file.open("convexhullpoints.dat");
 
-	float x;
-	float y;
+	double x;
+	double y;
 
 	// Loop through file and constantly update the min and max values
 	while(file >> x >> y)
@@ -241,21 +240,22 @@ void getMaxAndMin(float* x_min, float* x_max, float* y_min, float* y_max)
 		*y_min = min(y, *y_min);
 		*y_max = max(y, *y_max);
 	}
+	file.close();
 }
 
 int main(int argc, char **argv)
 {
-	GrowArray<float> arr;
+	GrowArray<double> arr;
 
-	float* x_min = new float;
-	float* x_max = new float;
-	float* y_min = new float;
-	float* y_max = new float;
+	double* x_min = new double;
+	double* x_max = new double;
+	double* y_min = new double;
+	double* y_max = new double;
 
-	*x_min = float(0.0);
-	*x_max = float(0.0);
-	*y_min = float(0.0);
-	*y_max = float(0.0);
+	*x_min = 0.0;
+	*x_max = 0.0;
+	*y_min = 0.0;
+	*y_max = 0.0;
 
 	getMaxAndMin(x_min, x_max, y_min, y_max);
 
@@ -265,11 +265,11 @@ int main(int argc, char **argv)
 	cout << *y_max << "\n";
 
 	// Find range of values so even divisions can be made
-	float x_range = *x_max - *x_min;
-	float y_range = *y_max - *y_min;
+	double x_range = *x_max - *x_min;
+	double y_range = *y_max - *y_min;
 
-	float x_divs[9];
-	float y_divs[9];
+	double x_divs[9];
+	double y_divs[9];
 
 	x_divs[0] = *x_min;
 	y_divs[0] = *y_min;
@@ -281,15 +281,54 @@ int main(int argc, char **argv)
 		y_divs[i] = y_divs[i-1] + y_range/8;
 	}
 
-	for(int i = 0; i <= 8; i++)
-	{
-		cout << x_divs[i] << " ";
-	}
-	cout << "\n";
+	// for(int i = 0; i <= 8; i++)
+	// {
+	// 	cout << x_divs[i] << " ";
+	// }
+	// cout << "\n";
+	//
+	// for(int i = 0; i <= 8; i++)
+	// {
+	// 	cout << y_divs[i] << " ";
+	// }
+	//
+	// cout << "\n";
 
-	for(int i = 0; i <= 8; i++)
+	// Create 8x8 array of GrowArrays that contain Point Objects
+	GrowArray<Point> rect[8][8];
+
+	// Point p;
+	//
+	// p.x = 6;
+	// p.y = 7;
+	//
+	// cout << p.x << " " << p.y << "\n";
+	//
+	// rect[0][0].addStart(p);
+	//
+	// rect[0][0].displayData();
+
+	Point p;
+
+	for(int i = 0; i < 8; i++)
 	{
-		cout << y_divs[i] << " ";
+		for(int j = 0; j < 8; j++)
+		{
+			p.x = i;
+			p.y = j;
+
+			rect[i][j].addStart(p);
+		}
+	}
+
+	for(int i = 0; i < 8; i++)
+	{
+		for(int j = 0; j < 8; j++)
+		{
+			cout << "Box (" << i << ", " << j << "): ";
+
+			rect[i][j].displayData();
+		}
 	}
 
 }
