@@ -14,6 +14,7 @@
 #include <fstream>
 #include <string>
 #include <algorithm>
+#include <iomanip>
 
 using namespace std;
 
@@ -217,8 +218,6 @@ public:
 	// return how many elements in the list
 	int size() const
 	{
-		cout << "capacity: " << capacity << "\n";
-		cout << "used: " << used << "\n";
 		return used;
 	}
 };
@@ -260,77 +259,14 @@ int main(int argc, char **argv)
 
 	getMaxAndMin(x_min, x_max, y_min, y_max);
 
-	cout << *x_min << "\n";
-	cout << *x_max << "\n";
-	cout << *y_min << "\n";
-	cout << *y_max << "\n";
-
 	// Find range of values so even divisions can be made
 	double x_range = *x_max - *x_min;
 	double y_range = *y_max - *y_min;
 
-	double x_divs[9];
-	double y_divs[9];
-
-	x_divs[0] = *x_min;
-	y_divs[0] = *y_min;
-
-	// Create divisions based on range of x and y points
-	for(int i = 1; i <= 8; i++)
-	{
-		x_divs[i] = x_divs[i-1] + x_range/8;
-		y_divs[i] = y_divs[i-1] + y_range/8;
-	}
-
-	// for(int i = 0; i <= 8; i++)
-	// {
-	// 	cout << x_divs[i] << " ";
-	// }
-	// cout << "\n";
-	//
-	// for(int i = 0; i <= 8; i++)
-	// {
-	// 	cout << y_divs[i] << " ";
-	// }
-	//
-	// cout << "\n";
-
 	// Create 8x8 array of GrowArrays that contain Point Objects
 	GrowArray<Point> rect[8][8];
 
-	// Point p;
-	//
-	// p.x = 6;
-	// p.y = 7;
-	//
-	// cout << p.x << " " << p.y << "\n";
-	//
-	// rect[0][0].addStart(p);
-	//
-	// rect[0][0].displayData();
-
 	Point p;
-
-	// for(int i = 0; i < 8; i++)
-	// {
-	// 	for(int j = 0; j < 8; j++)
-	// 	{
-	// 		p.x = i;
-	// 		p.y = j;
-	//
-	// 		rect[i][j].addStart(p);
-	// 	}
-	// }
-	//
-	// for(int i = 0; i < 8; i++)
-	// {
-	// 	for(int j = 0; j < 8; j++)
-	// 	{
-	// 		cout << "Box (" << i << ", " << j << "): ";
-	//
-	// 		rect[i][j].displayData();
-	// 	}
-	// }
 
 	fstream file;
 	file.open("convexhullpoints.dat");
@@ -338,25 +274,15 @@ int main(int argc, char **argv)
 	// Sort the points into their proper GrowArrays
 	while(file >> p.x >> p.y)
 	{
-		int i = ((p.y - *y_min)/(y_range))*(8-1);
-		int j = ((p.x - *x_min)/((x_range))*(8-1));
+		int i = ((p.y - *y_min)/(y_range))*(8-1) + .5;
+		int j = ((p.x - *x_min)/((x_range))*(8-1)) + .5;
 
-		cout << p.x << ", " << p.y << " placed in box: (" << i << ", " << j << ") \n";
+		// cout << p.x << ", " << p.y << " placed in box: (" << i << ", " << j << ") \n";
 
 		rect[i][j].addEnd(p);
 	}
 
 	file.close();
-
-	for(int i = 0; i < 8; i++)
-	{
-		for(int j = 0; j < 8; j++)
-		{
-			cout << "Box (" << i << ", " << j << "): ";
-
-			rect[i][j].displayData();
-		}
-	}
 
 	// Display max and min
 	cout << "X min = " << *x_min << "		X max = " << *x_max << "\n";
@@ -370,14 +296,14 @@ int main(int argc, char **argv)
 			// First or last row
 			if(i == 0 or i == 7)
 			{
-				cout << "Row: " << i << "\n";
+				cout << "Box: (" << i << ", " << j << ") \n";
 				rect[i][j].displayData();
 			}
 
 			// First or last column
 			else if(j == 0 or j == 7)
 			{
-				cout << "Column: " << j << "\n";
+				cout << "Box: (" << i << ", " << j << ") \n";
 				rect[i][j].displayData();
 			}
 		}
