@@ -31,7 +31,10 @@ private:
 	int capacity; // the amount of memory allocated
  	int used;     // the current size of the list
  	T* data;
- 	void grow() {}
+ 	void grow()
+	{
+		capacity *= 2;
+	}
 public:
 	GrowArray() : capacity(1), used(0), data(new T[1]) {}
 	GrowArray(int initialSize) {} // set initial capacity
@@ -49,7 +52,7 @@ public:
 		if(used == capacity)
 		{
 			T* old = data; // Save old data
-			capacity *= 2;
+			grow();
 			data = new T[capacity];
 
 			// Transfer data into new larger array
@@ -79,7 +82,7 @@ public:
 		if(used == capacity)
 		{
 			T* old = data; // Save old data
-			capacity *= 2;
+			grow();
 			data = new T[capacity];
 
 			// Transfer data into new larger array but shifted over one
@@ -118,7 +121,7 @@ public:
 		if(used == capacity)
 		{
 			T* old = data; // Save old data
-			capacity *= 2;
+			grow();
 			data = new T[capacity];
 
 			// Transfer data before the index into the new array
@@ -231,6 +234,12 @@ void getMaxAndMin(double* x_min, double* x_max, double* y_min, double* y_max)
 	double x;
 	double y;
 
+	//Get initial values
+	file >> *x_min;
+	*x_max = *x_min;
+	file >> *y_min;
+	*y_max = *y_min;
+
 	// Loop through file and constantly update the min and max values
 	while(file >> x >> y)
 	{
@@ -251,11 +260,6 @@ int main(int argc, char **argv)
 	double* x_max = new double;
 	double* y_min = new double;
 	double* y_max = new double;
-
-	*x_min = 0.0;
-	*x_max = 0.0;
-	*y_min = 0.0;
-	*y_max = 0.0;
 
 	getMaxAndMin(x_min, x_max, y_min, y_max);
 
@@ -296,14 +300,14 @@ int main(int argc, char **argv)
 			// First or last row
 			if(i == 0 or i == 7)
 			{
-				cout << "Box: (" << i << ", " << j << ") \n";
+				cout << "Box: (" << i << ", " << j << ") 	";
 				rect[i][j].displayData();
 			}
 
 			// First or last column
 			else if(j == 0 or j == 7)
 			{
-				cout << "Box: (" << i << ", " << j << ") \n";
+				cout << "Box: (" << i << ", " << j << ") 	";
 				rect[i][j].displayData();
 			}
 		}
