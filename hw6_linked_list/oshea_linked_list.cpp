@@ -76,7 +76,7 @@ public:
 		Node* n = head;
 
 		// Move the pointer until we've reached the desired node
-		while(i > 0)
+		while(i > 1)
 		{
 			n = n->next;
 			i--;
@@ -125,7 +125,74 @@ public:
 		// n now points to the 2nd to last node and m points to the last node
 		n->next = nullptr; // Remove the last node
 		return m->val;
+	}
 
+	// Remove the node at the specified index
+	// Head -> middle stuff -> node at desired index -> whatever node at desired index at desired index is pointing to
+	// becomes
+	// Head -> middle stuff -> whatever node at desired index at desired index was pointing to
+	int remove(int i)
+	{
+		Node* n = head;
+		Node* m = n->next;
+
+		// There's only one node in the list
+		if(m == nullptr)
+		{
+			int v = head->val; // Get the value
+			head = nullptr; // Remove the node
+			return v;
+		}
+
+		// Move the pointer until we've reached the desired node
+		while(i > 1)
+		{
+			n = m;
+			m = m->next;
+			i--;
+		}
+
+		// n now points to the node before the node to remove and m points to
+		// the last node to remove
+		n->next = m->next; // Remove the desired node
+		return m->val;
+	}
+
+	// Return the value stored in the node at the specified index
+	int getVal(int i)
+	{
+		Node* n = head;
+
+		// Move the pointer until we've reached the desired node
+		while(i > 1)
+		{
+			n = n->next;
+			i--;
+		}
+
+		// We're at the desired node so return the value
+		return n->val;
+	}
+
+	// Returns the length of the Linkedlist
+	int getLength()
+	{
+		Node* n;
+		int count = 0;
+
+		// Check if there are no nodes in the list
+		if(head == nullptr)
+		{
+			return 0;
+		}
+
+		// Loop until the end of the list is found
+		// Once n->next == nullptr the last node in the list has been found
+		for(n = head; n->next != nullptr; n = n->next)
+		{
+			count++;
+		}
+		return count + 1;
 	}
 
 	// Display all the numbers in the LinkedList
@@ -136,23 +203,74 @@ public:
 		for(; n != nullptr; n = n->next)
 		{
 			cout << n->val << " ";
-
 		}
 	}
 
 };
 
+LinkedList splitOddsAndEvens(LinkedList* listA)
+{
+	LinkedList listB;
+
+	listA->display();
+	cout << "\n";
+
+	int val = 0;
+	int len = listA->getLength();
+
+	for(int i = 0; i <= len; i++)
+	{
+		val = listA->getVal(i);
+
+		if(val%2 == 0)
+		{
+			listB.addEnd(val);
+			listA->remove(i);
+			cout << val << " Removed from A and added to B \n";
+		}
+
+		len = listA->getLength();
+		cout << "Current length of A is: " << len << " and i = " << i << "\n";
+	}
+
+	return listB;
+}
+
+// Read the contents out of a file and returns them as a LinkedList
+LinkedList loadFile()
+{
+	fstream file;
+	file.open("hw5.dat");
+
+	int x;
+
+	LinkedList list;
+
+	// Load the contents of the file into the linkedList
+	while(file >> x)
+	{
+		list.addEnd(x);
+	}
+
+	file.close();
+
+	return list;
+}
+
 int main(int argc, char **argv)
 {
-	LinkedList LL;
+	LinkedList listA = loadFile();
 
-	LL.addStart(7);
-	LL.addEnd(9);
-	LL.addStart(1);
-	LL.insert(1, 34);
-	LL.removeEnd();
-	LL.removeStart();
-	LL.insert(0, 55);
-	LL.insert(2, 910);
-	LL.display();
+	listA.display();
+	cout << "\n";
+
+	// LinkedList listB = splitOddsAndEvens(&listA);
+
+	LinkedList listB;
+
+	listB.addEnd(listA.remove(listA.getLength()));
+
+	listA.display();
+	listB.display();
+
 }
