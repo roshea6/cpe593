@@ -4,7 +4,7 @@
 	 Description: Takes in the list from a file and then splits it into two seperate
 	 linked lists where one is numbers and one is odd numbers
 
-	 cite:
+	 cite: Just the stuff from the course github
 
 	 "I pledge my honor that I have abided by the Stevens Honor System"
 */
@@ -138,7 +138,6 @@ public:
 	// Head -> middle stuff -> node at desired index -> whatever node at desired index at desired index is pointing to
 	// becomes
 	// Head -> middle stuff -> whatever node at desired index at desired index was pointing to
-	// TODO: Doesn't work for first element in list or last element
 	int remove(int i)
 	{
 		Node* n = head;
@@ -173,7 +172,6 @@ public:
 	}
 
 	// Return the value stored in the node at the specified index
-	// TODO: After the first element all the indexes become off by one
 	int getVal(int i)
 	{
 		Node* n = head;
@@ -277,29 +275,64 @@ LinkedList loadFile()
 	return list;
 }
 
+// Inserts the elements of listB into the even indecies of listA and returns
+// the updated list
+void combineLists(LinkedList* listA, LinkedList* listB)
+{
+	int count = 0;
+
+	// If there's nothing in list B then just return A as is
+	if(listB->getLength() == 0)
+	{
+		return;
+	}
+
+	// Loop through the length of A and insert items from B in the proper place
+	for(int i = 0; i < listA->getLength(); i +=2)
+	{
+		if(i == 0)
+		{
+			listA->addStart(listB->getVal(0));
+			count++;
+		}
+
+		else
+		{
+			listA->insert(i-1, listB->getVal(i/2));
+			count++;
+		}
+
+		// Break out if we've run out of elements in B to add to A
+		if(count >= listB->getLength())
+		{
+			break;
+		}
+	}
+
+	// If there are still items left in B append them all to the end
+	if(count < listB->getLength())
+	{
+		for(int i = count; i < listB->getLength(); i++)
+		{
+			listA->addEnd(listB->getVal(i));
+		}
+	}
+
+}
+
 int main(int argc, char **argv)
 {
+	// Load file into listA
 	LinkedList listA = loadFile();
 
-	listA.display();
-	cout << "\n";
-
+	// Remove even numbers from A and put them B
 	LinkedList listB = splitOddsAndEvens(&listA);
 
-	// LinkedList listB;
-	//
-	// int val = listA.getVal(0);
-	//
-	// listB.addEnd(val);
-	//
-	// // listA.insert(2, 999);
-	// // listA.insert(5, 1000);
-	//
-	// listA.remove(listA.getLength() - 1);
+	// Recombine B into A with alternating evens and odds
+	combineLists(&listA, &listB);
 
+	// Display the contents of A
 	listA.display();
-	cout << "\n";
-	listB.display();
 	cout << "\n";
 
 }
