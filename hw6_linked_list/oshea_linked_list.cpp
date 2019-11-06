@@ -75,8 +75,15 @@ public:
 	{
 		Node* n = head;
 
+		// Check if it's inserting in the first index
+		if(i == 0)
+		{
+			addStart(v);
+			return;
+		}
+
 		// Move the pointer until we've reached the desired node
-		while(i > 1)
+		while(i > 0)
 		{
 			n = n->next;
 			i--;
@@ -131,10 +138,17 @@ public:
 	// Head -> middle stuff -> node at desired index -> whatever node at desired index at desired index is pointing to
 	// becomes
 	// Head -> middle stuff -> whatever node at desired index at desired index was pointing to
+	// TODO: Doesn't work for first element in list or last element
 	int remove(int i)
 	{
 		Node* n = head;
 		Node* m = n->next;
+
+		// If we want to remove the first node
+		if(i == 0)
+		{
+			return removeStart();
+		}
 
 		// There's only one node in the list
 		if(m == nullptr)
@@ -153,18 +167,19 @@ public:
 		}
 
 		// n now points to the node before the node to remove and m points to
-		// the last node to remove
+		// the node to remove
 		n->next = m->next; // Remove the desired node
 		return m->val;
 	}
 
 	// Return the value stored in the node at the specified index
+	// TODO: After the first element all the indexes become off by one
 	int getVal(int i)
 	{
 		Node* n = head;
 
 		// Move the pointer until we've reached the desired node
-		while(i > 1)
+		while(i > 0)
 		{
 			n = n->next;
 			i--;
@@ -208,29 +223,34 @@ public:
 
 };
 
+// Loop through a linked list, remove all the even numbers and return them in a 2nd
+// linked list
 LinkedList splitOddsAndEvens(LinkedList* listA)
 {
 	LinkedList listB;
 
-	listA->display();
-	cout << "\n";
-
 	int val = 0;
 	int len = listA->getLength();
 
-	for(int i = 0; i <= len; i++)
+	for(int i = 0; i < len;)
 	{
 		val = listA->getVal(i);
 
+		// If the value is even remove it from A and add it to B
 		if(val%2 == 0)
 		{
 			listB.addEnd(val);
 			listA->remove(i);
-			cout << val << " Removed from A and added to B \n";
+			len--;	//Update length value
 		}
 
-		len = listA->getLength();
-		cout << "Current length of A is: " << len << " and i = " << i << "\n";
+		// Only increment when an odd number is found so we don't miss two evens
+		 // in a row
+		else
+		{
+			i++;
+		}
+
 	}
 
 	return listB;
@@ -264,13 +284,22 @@ int main(int argc, char **argv)
 	listA.display();
 	cout << "\n";
 
-	// LinkedList listB = splitOddsAndEvens(&listA);
+	LinkedList listB = splitOddsAndEvens(&listA);
 
-	LinkedList listB;
-
-	listB.addEnd(listA.remove(listA.getLength()));
+	// LinkedList listB;
+	//
+	// int val = listA.getVal(0);
+	//
+	// listB.addEnd(val);
+	//
+	// // listA.insert(2, 999);
+	// // listA.insert(5, 1000);
+	//
+	// listA.remove(listA.getLength() - 1);
 
 	listA.display();
+	cout << "\n";
 	listB.display();
+	cout << "\n";
 
 }
