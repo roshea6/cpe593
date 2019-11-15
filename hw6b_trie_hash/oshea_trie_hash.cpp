@@ -3,7 +3,7 @@
 
 	 Description: Implementation of trie and linear chaining hashmap
 
-	 cite: Just the stuff from the course github
+	 cite: https://www.geeksforgeeks.org/convert-string-char-array-cpp/
 
 	 "I pledge my honor that I have abided by the Stevens Honor System"
 */
@@ -35,8 +35,8 @@ public:
 	~Trie() {}
 
 	// load the trie from a file name given
-	void load(const char dictionary[]) {
-
+	void load(const char dictionary[]) 
+	{
 		fstream file;
 		file.open(dictionary);
 
@@ -53,12 +53,16 @@ public:
 		while(file >> temp)
 		{
 			// Convert string to char array
-			char arr[temp.length()];
+			char arr[temp.length() + 1];
 
 			for(int i = 0; i < sizeof(arr); i++)
 			{
 				arr[i] = temp[i];
 			}
+
+			arr[temp.length()] = '\0'; // Append ending character 
+
+			// cout << temp << "\n";
 			
 			add(arr);
 		}
@@ -78,6 +82,12 @@ public:
 		for(int i = 0; word[i] != 0; i++)
 		{
 			int idx = word[i] - 'a'; // Get the proper index from 0-25
+
+			// Check for non lowercase a-z
+			if(idx < 0 || idx > 25)
+			{
+				return;
+			}
 
 			if(p->next[idx] == nullptr)
 			{
@@ -100,6 +110,12 @@ public:
 		{
 			int idx = word[i] - 'a'; // Get the proper index from 0-25
 
+			// Check for non lowercase a-z
+			if(idx < 0 || idx > 25)
+			{
+				return;
+			}
+
 			if(p->next[idx] == nullptr)
 			{
 				return;
@@ -120,6 +136,12 @@ public:
 		{
 			int idx = word[i] - 'a'; // Get the proper index from 0-25
 
+			// Check for non lowercase a-z
+			if(idx < 0 || idx > 25)
+			{
+				return false;
+			}
+
 			if(p->next[idx] == nullptr)
 			{
 				return false;
@@ -139,6 +161,12 @@ public:
 		for(int i = 0; word[i] != 0; i++)
 		{
 			int idx = word[i] - 'a'; // Get the proper index from 0-25
+
+			// Check for non lowercase a-z
+			if(idx < 0 || idx > 25)
+			{
+				return false;
+			}
 
 			if(p->next[idx] == nullptr)
 			{
@@ -177,6 +205,245 @@ public:
 		}
 	}
 }; 
+
+template<typename T>
+class LinkedList
+{
+private:
+	class Node { //Node object to make the linked list out of
+	public:
+		T val;
+		Node* next; // Points to the next Node object in the list or nullptr
+
+		// Constructor
+		Node(T v, Node* n) : val(v), next(n) {}
+	};
+
+	// Pointer to first node in the list
+	Node* head;
+
+public:
+	// Constructor
+	LinkedList()
+	{
+		head = nullptr;
+	}
+
+	// Add Node to start of linked list.
+	// Head -> New Node -> whatever head was pointing to
+	void addStart(T v)
+	{
+		head = new Node(v, head);
+	}
+
+	// Add Node to the end of the linked list
+	// Head -> middle stuff -> New Node -> nullptr
+	void addEnd(T v)
+	{
+		Node* temp = new Node(v, nullptr); // Node being placed at the end
+		Node* n;
+
+		// Check if there are no nodes in the list
+		if(head == nullptr)
+		{
+			head = temp;
+			return;
+		}
+
+		// Loop until the end of the list is found
+		// Once n->next == nullptr the last node in the list has been found
+		for(n = head; n->next != nullptr; n = n->next)
+		{
+			// Do nothing
+		}
+
+		// n now points to the last node in the list so switch the node that points
+		// to from nullptr to the node we want to add to the end
+		n->next = temp;
+	}
+
+	// Inserts a node at a specified index i
+	// Head -> middle stuff -> node at desired index -> new node -> whatever node at desired index at desired index was pointing to
+	void insert(int i, T v)
+	{
+		Node* n = head;
+
+		// Check if it's inserting in the first index
+		if(i == 0)
+		{
+			addStart(v);
+			return;
+		}
+
+		// Move the pointer until we've reached the desired node
+		while(i > 0)
+		{
+			n = n->next;
+			i--;
+		}
+
+		// We're at the desired node so insert the new one between the two
+		n->next = new Node(v, n->next);
+	}
+
+	// Remove the node at the beginning of the list and return its value
+	// head -> old node -> what old node was pointing to
+	// becomes
+	// head -> what old node was pointing to
+	T removeStart()
+	{
+		Node* n = head; // Point to whatever head is pointing at to save the node temporarily
+		head = head->next; // Remove the node from the list
+		return n->val; // Return the value from the removed node
+	}
+
+	// Remove the node at the end of the list
+	// head -> middle stuff -> last node -> nullptr
+	// becomes
+	// head -> middle stuff -> nullptr
+	T removeEnd()
+	{
+		Node* n = head;
+		Node* m = n->next;
+
+		// There's only one node in the list
+		if(m == nullptr)
+		{
+			T v = head->val; // Get the value
+			head = nullptr; // Remove the node
+			return v;
+		}
+
+		// Loop until the end of the list is found by m.
+		// Once m->next == nullptr, n will point to the 2nd to last node
+		for(; m->next != nullptr;)
+		{
+			n = m; // Move n to m
+			m = m->next; // Move up m to the next node
+		}
+
+		// n now points to the 2nd to last node and m points to the last node
+		n->next = nullptr; // Remove the last node
+		return m->val;
+	}
+
+	// Remove the node at the specified index
+	// Head -> middle stuff -> node at desired index -> whatever node at desired index at desired index is pointing to
+	// becomes
+	// Head -> middle stuff -> whatever node at desired index at desired index was pointing to
+	T remove(int i)
+	{
+		Node* n = head;
+		Node* m = n->next;
+
+		// If we want to remove the first node
+		if(i == 0)
+		{
+			return removeStart();
+		}
+
+		// There's only one node in the list
+		if(m == nullptr)
+		{
+			T v = head->val; // Get the value
+			head = nullptr; // Remove the node
+			return v;
+		}
+
+		// Move the pointer until we've reached the desired node
+		while(i > 1)
+		{
+			n = m;
+			m = m->next;
+			i--;
+		}
+
+		// n now points to the node before the node to remove and m points to
+		// the node to remove
+		n->next = m->next; // Remove the desired node
+		return m->val;
+	}
+
+	// Return the value stored in the node at the specified index
+	T getVal(int i)
+	{
+		Node* n = head;
+
+		// Move the pointer until we've reached the desired node
+		while(i > 0)
+		{
+			n = n->next;
+			i--;
+		}
+
+		// We're at the desired node so return the value
+		return n->val;
+	}
+
+	// Returns the length of the Linkedlist
+	int getLength()
+	{
+		Node* n;
+		int count = 0;
+
+		// Check if there are no nodes in the list
+		if(head == nullptr)
+		{
+			return 0;
+		}
+
+		// Loop until the end of the list is found
+		// Once n->next == nullptr the last node in the list has been found
+		for(n = head; n->next != nullptr; n = n->next)
+		{
+			count++;
+		}
+		return count + 1;
+	}
+
+	// Display all the numbers in the LinkedList
+	void display()
+	{
+		Node* n = head;
+
+		for(; n != nullptr; n = n->next)
+		{
+			cout << n->val << " ";
+		}
+	}
+
+};
+
+class HashMapLinearChaining {
+private:
+	uint32_t size;
+	LinkedList<string>* table;
+public:
+	HashMapLinearChaining(uint32_t size) {
+		table = new LinkedList<string>[size];
+	}
+	~HashMapLinearChaining() {}
+	HashMapLinearChaining(const HashMapLinearChaining& orig) = delete;
+	HashMapLinearChaining& operator =(const HashMapLinearChaining& orig) = delete;
+	void add(const string& s) {
+		
+	}
+	void remove(const string& s) {
+
+	}
+	bool contains(const string& s) {
+
+	}
+	void computeHistogram() {
+    // generate an array of 10 elements
+		//hist[0] = number of empty bins
+		// hist[1] = number of bins containing 1 element
+		// hist[2] = number of bins containing 2 elements...
+
+		// hist[9] = number of bins containing 9 OR GREATER
+		//		print all non-zero bins:
+	}
+};
 
 // Prints out all the words in a given file that the passed in trie contains
 void containsFileContents(Trie* tri, string filename)
@@ -274,32 +541,81 @@ void removeFromTrie(Trie* tri, string filename)
 	file.close();
 }
 
+int prideNonWords(Trie* dict, string filename)
+{
+	fstream file;
+	file.open(filename);
+
+	int count = 0;
+
+	if(!file)
+	{
+		cout << "File not found \n";
+		return -1;
+	}
+
+	string temp;
+
+	while(file >> temp)
+	{
+		// Convert string to char array
+		char arr[temp.length() + 1];
+
+		for(int i = 0; i < sizeof(arr); i++)
+		{
+			arr[i] = temp[i];
+		}
+
+		// Add ending character
+		arr[temp.length()] = '\0';
+		
+		if(dict->contains(arr))
+		{
+			continue;
+		}
+		else
+		{
+			count++;
+		}
+	}
+
+	file.close();
+
+	return count;
+}
+
 int main(int argc, char** atgv)
 {
-	Trie tri;
+	// Trie tri;
 
-	// Add the words in the file to the trie
-	tri.load("testAdd.txt");
+	// // Add the words in the file to the trie
+	// tri.load("testAdd.txt");
 
-	cout << "Words in common between testAdd and testContains: \n";
+	// cout << "Words in common between testAdd and testContains: \n";
 
-	// Test which words from the file are in the trie
-	containsFileContents(&tri, "testContains.txt");
+	// // Test which words from the file are in the trie
+	// containsFileContents(&tri, "testContains.txt");
 
-	cout << "\n";
-
-
-	cout << "Words and prefixes in common between testAdd and testContains: \n";
-
-	containsPrefixes(&tri, "testTriePrefix.txt");
-
-	cout << "\n";
+	// cout << "\n";
 
 
-	removeFromTrie(&tri, "testRemove.txt");
+	// cout << "Words and prefixes in common between testAdd and testContains: \n";
 
-	cout << "Trie after remove of words from testRemove \n";
+	// containsPrefixes(&tri, "testTriePrefix.txt");
 
-	tri.print();
+	// cout << "\n";
+
+
+	// removeFromTrie(&tri, "testRemove.txt");
+
+	// cout << "Trie after removal of words from testRemove \n";
+
+	// tri.print();
+
+	Trie prideTrie;
+
+	prideTrie.load("dict.txt");
+
+	cout << "Number of non-dictionary entries: " << prideNonWords(&prideTrie, "prideandprejudice.txt") << "\n";
 
 }
