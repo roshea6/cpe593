@@ -4,6 +4,7 @@
 	 Description: Implementation of trie and linear chaining hashmap
 
 	 cite: https://www.geeksforgeeks.org/convert-string-char-array-cpp/
+	 cplusplus.com/reference/functional/hash/ 
 
 	 "I pledge my honor that I have abided by the Stevens Honor System"
 */
@@ -11,6 +12,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+
 
 using namespace std;
 
@@ -207,9 +209,6 @@ public:
 }; 
 
 template<typename T>
-class LinkedList
-{
-private:
 	class Node { //Node object to make the linked list out of
 	public:
 		T val;
@@ -219,10 +218,24 @@ private:
 		Node(T v, Node* n) : val(v), next(n) {}
 	};
 
-	// Pointer to first node in the list
-	Node* head;
+template<typename T>
+class LinkedList
+{
+private:
+	// class Node { //Node object to make the linked list out of
+	// public:
+	// 	T val;
+	// 	Node* next; // Points to the next Node object in the list or nullptr
+
+	// 	// Constructor
+	// 	Node(T v, Node* n) : val(v), next(n) {}
+	// };
+
 
 public:
+	// Pointer to first node in the list
+	Node<T>* head;
+
 	// Constructor
 	LinkedList()
 	{
@@ -233,15 +246,15 @@ public:
 	// Head -> New Node -> whatever head was pointing to
 	void addStart(T v)
 	{
-		head = new Node(v, head);
+		head = new Node<T>(v, head);
 	}
 
 	// Add Node to the end of the linked list
 	// Head -> middle stuff -> New Node -> nullptr
 	void addEnd(T v)
 	{
-		Node* temp = new Node(v, nullptr); // Node being placed at the end
-		Node* n;
+		Node<T>* temp = new Node<T>(v, nullptr); // Node being placed at the end
+		Node<T>* n;
 
 		// Check if there are no nodes in the list
 		if(head == nullptr)
@@ -266,7 +279,7 @@ public:
 	// Head -> middle stuff -> node at desired index -> new node -> whatever node at desired index at desired index was pointing to
 	void insert(int i, T v)
 	{
-		Node* n = head;
+		Node<T>* n = head;
 
 		// Check if it's inserting in the first index
 		if(i == 0)
@@ -283,7 +296,7 @@ public:
 		}
 
 		// We're at the desired node so insert the new one between the two
-		n->next = new Node(v, n->next);
+		n->next = new Node<T>(v, n->next);
 	}
 
 	// Remove the node at the beginning of the list and return its value
@@ -292,7 +305,7 @@ public:
 	// head -> what old node was pointing to
 	T removeStart()
 	{
-		Node* n = head; // Point to whatever head is pointing at to save the node temporarily
+		Node<T>* n = head; // Point to whatever head is pointing at to save the node temporarily
 		head = head->next; // Remove the node from the list
 		return n->val; // Return the value from the removed node
 	}
@@ -303,8 +316,8 @@ public:
 	// head -> middle stuff -> nullptr
 	T removeEnd()
 	{
-		Node* n = head;
-		Node* m = n->next;
+		Node<T>* n = head;
+		Node<T>* m = n->next;
 
 		// There's only one node in the list
 		if(m == nullptr)
@@ -333,8 +346,8 @@ public:
 	// Head -> middle stuff -> whatever node at desired index at desired index was pointing to
 	T remove(int i)
 	{
-		Node* n = head;
-		Node* m = n->next;
+		Node<T>* n = head;
+		Node<T>* m = n->next;
 
 		// If we want to remove the first node
 		if(i == 0)
@@ -367,7 +380,7 @@ public:
 	// Return the value stored in the node at the specified index
 	T getVal(int i)
 	{
-		Node* n = head;
+		Node<T>* n = head;
 
 		// Move the pointer until we've reached the desired node
 		while(i > 0)
@@ -380,10 +393,26 @@ public:
 		return n->val;
 	}
 
+	// Return the value stored in the node at the specified index
+	void updateVal(int i, T newVal)
+	{
+		Node<T>* n = head;
+
+		// Move the pointer until we've reached the desired node
+		while(i > 0)
+		{
+			n = n->next;
+			i--;
+		}
+
+		// We're at the desired node so return the value
+		n->val = newVal;
+	}
+
 	// Returns the length of the Linkedlist
 	int getLength()
 	{
-		Node* n;
+		Node<T>* n;
 		int count = 0;
 
 		// Check if there are no nodes in the list
@@ -404,12 +433,13 @@ public:
 	// Display all the numbers in the LinkedList
 	void display()
 	{
-		Node* n = head;
+		Node<T>* n = head;
 
 		for(; n != nullptr; n = n->next)
 		{
 			cout << n->val << " ";
 		}
+		cout << "\n";
 	}
 
 };
@@ -418,22 +448,87 @@ class HashMapLinearChaining {
 private:
 	uint32_t size;
 	LinkedList<string>* table;
+
+	
 public:
-	HashMapLinearChaining(uint32_t size) {
-		table = new LinkedList<string>[size];
+	HashMapLinearChaining(uint32_t buckets) {
+		table = new LinkedList<string>[buckets];
+		size = buckets;
 	}
 	~HashMapLinearChaining() {}
 	HashMapLinearChaining(const HashMapLinearChaining& orig) = delete;
 	HashMapLinearChaining& operator =(const HashMapLinearChaining& orig) = delete;
-	void add(const string& s) {
+	
+	// Add a new word to to the hash map
+	void add(const string& s) 
+	{
+		// Get the position by taking hashing the key
+		hash<string> get_pos;
+		int pos = get_pos(s) % size;
 		
+		cout << "pos = " << pos << "\n";
+
+		LinkedList<string>* p = &table[pos];
+		// p->addStart(s);
+
+		Node<string>* n = p->head;
+
+		int idx = 0;
+
+		// Check if item already exists in the hash map
+		while(n != nullptr)
+		{
+			// If it does then update its value
+			if(p->getVal(idx) == s)
+			{
+				p->updateVal(idx, s);
+				cout << "Updating value for " << s << "\n";
+				return;
+			}
+			idx++;
+			n = n->next;
+		}
+
+		// If the value didn't previously exist make add it as a new entry 
+		p->addStart(s);
 	}
-	void remove(const string& s) {
+
+	void remove(const string& s) 
+	{
 
 	}
-	bool contains(const string& s) {
+	bool contains(const string& s) 
+	{
+		// Get the position by taking hashing the key
+		hash<string> get_pos;
+		int pos = get_pos(s) % size;
+		
+		cout << "pos = " << pos << "\n";
 
+		LinkedList<string>* p = &table[pos];
+		// p->addStart(s);
+
+		Node<string>* n = p->head;
+
+		int idx = 0;
+
+		// Check if item already exists in the hash map
+		while(n != nullptr)
+		{
+			// If it does then update its value
+			if(p->getVal(idx) == s)
+			{
+				cout << "Found it at "<< idx << " \n";
+				return true;
+			}
+			idx++;
+			n = n->next;
+		}
+
+		// If we made it through the entire linkedlist without finding it then return false
+		return false;
 	}
+
 	void computeHistogram() {
     // generate an array of 10 elements
 		//hist[0] = number of empty bins
@@ -586,6 +681,7 @@ int prideNonWords(Trie* dict, string filename)
 
 int main(int argc, char** atgv)
 {
+	// Trie portion 
 	// Trie tri;
 
 	// // Add the words in the file to the trie
@@ -612,10 +708,33 @@ int main(int argc, char** atgv)
 
 	// tri.print();
 
-	Trie prideTrie;
+	// Pride and prejuidice Trie 
 
-	prideTrie.load("dict.txt");
+	// Trie prideTrie;
 
-	cout << "Number of non-dictionary entries: " << prideNonWords(&prideTrie, "prideandprejudice.txt") << "\n";
+	// prideTrie.load("dict.txt");
+
+	// cout << "Number of non-dictionary entries: " << prideNonWords(&prideTrie, "prideandprejudice.txt") << "\n";
+
+
+	// Hashmap portion
+
+	// hash<string> str_hash;
+	// string str1 = "world";
+
+	// cout << str1 << " = " << str_hash(str1) << "\n";
+
+	HashMapLinearChaining hash_map(500000);
+
+	string str1 = "Hello";
+
+	hash_map.add(str1);
+
+	string str2 = "World";
+
+	hash_map.add(str2);
+
+	string str3 = "Hello";
+	hash_map.add(str3);
 
 }
