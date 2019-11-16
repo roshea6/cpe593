@@ -439,7 +439,6 @@ public:
 		{
 			cout << n->val << " ";
 		}
-		cout << "\n";
 	}
 
 };
@@ -466,10 +465,8 @@ public:
 		hash<string> get_pos;
 		int pos = get_pos(s) % size;
 		
-		cout << "pos = " << pos << "\n";
 
 		LinkedList<string>* p = &table[pos];
-		// p->addStart(s);
 
 		Node<string>* n = p->head;
 
@@ -482,7 +479,6 @@ public:
 			if(p->getVal(idx) == s)
 			{
 				p->updateVal(idx, s);
-				cout << "Updating value for " << s << "\n";
 				return;
 			}
 			idx++;
@@ -493,18 +489,13 @@ public:
 		p->addStart(s);
 	}
 
+	// Remove an item from the hashmap
 	void remove(const string& s) 
-	{
-
-	}
-	bool contains(const string& s) 
 	{
 		// Get the position by taking hashing the key
 		hash<string> get_pos;
 		int pos = get_pos(s) % size;
 		
-		cout << "pos = " << pos << "\n";
-
 		LinkedList<string>* p = &table[pos];
 		// p->addStart(s);
 
@@ -518,7 +509,36 @@ public:
 			// If it does then update its value
 			if(p->getVal(idx) == s)
 			{
-				cout << "Found it at "<< idx << " \n";
+				p->remove(idx);
+				return;
+			}
+			idx++;
+			n = n->next;
+		}
+
+		// Value was not found in the list
+	}
+
+	// Check if the hashmap contains the specified string
+	bool contains(const string& s) 
+	{
+		// Get the position by taking hashing the key
+		hash<string> get_pos;
+		int pos = get_pos(s) % size;
+		
+
+		LinkedList<string>* p = &table[pos];
+
+		Node<string>* n = p->head;
+
+		int idx = 0;
+
+		// Check if item already exists in the hash map
+		while(n != nullptr)
+		{
+			// If it does then update its value
+			if(p->getVal(idx) == s)
+			{
 				return true;
 			}
 			idx++;
@@ -529,14 +549,94 @@ public:
 		return false;
 	}
 
-	void computeHistogram() {
-    // generate an array of 10 elements
+	// Create a histogram 
+	void computeHistogram() 
+	{
+    	// generate an array of 10 elements
 		//hist[0] = number of empty bins
 		// hist[1] = number of bins containing 1 element
 		// hist[2] = number of bins containing 2 elements...
 
 		// hist[9] = number of bins containing 9 OR GREATER
 		//		print all non-zero bins:
+		int hist[10];
+
+		for(int i = 0; i < 10; i++)
+		{
+			hist[i] = 0;
+		}
+
+		int len;
+
+		LinkedList<string>* p; 
+
+		// Loop through all lists in the hash map
+		for(int pos = 0; pos < size; pos++)
+		{
+			// Get the array
+			p = &table[pos];
+
+			// Get the length of the array
+			len = p->getLength();
+
+			// Populate proper bins
+			if(len < 9)
+			{
+				hist[len]++;
+			}
+			else
+			{
+				hist[9]++;
+			}
+		}
+
+		// Loop through hist and print non zero bins
+		for(int i = 0; i < 10; i++)
+		{
+			if(hist[i] > 0)
+			{
+				cout << "hist[" << i << "] = " << hist[i] << "\n";
+			}
+		}	
+	}
+
+	// Prints out each list in the hashmap
+	void printHash()
+	{
+		LinkedList<string>* p; 
+
+		// Loop through all lists in the hash map
+		for(int pos = 0; pos < size; pos++)
+		{
+			// Get the array
+			p = &table[pos];
+
+			p->display();
+		}
+		cout << "\n";
+	}
+
+	// Load contents from a file into a hashmap
+	void loadFile(const char filename[])
+	{
+		fstream file;
+		file.open(filename);
+
+		if(!file)
+		{
+			cout << "File not found \n";
+			return;
+		}
+
+		string temp;
+
+		// Stream contents out of file
+		while(file >> temp)
+		{
+			add(temp);
+		}
+
+		file.close();
 	}
 };
 
@@ -636,6 +736,7 @@ void removeFromTrie(Trie* tri, string filename)
 	file.close();
 }
 
+// Returns the number of items in a file that don't exist in the trie
 int prideNonWords(Trie* dict, string filename)
 {
 	fstream file;
@@ -679,62 +780,154 @@ int prideNonWords(Trie* dict, string filename)
 	return count;
 }
 
+// Prints out all the words in a given file that the passed in hashmap contains
+void containsHash(HashMapLinearChaining* hash_map, string filename)
+{
+	fstream file;
+	file.open(filename);
+
+	if(!file)
+	{
+		cout << "File not found \n";
+		return;
+	}
+
+	string temp;
+
+	while(file >> temp)
+	{	
+		if(hash_map->contains(temp))
+		{
+			cout << temp << "\n";
+		}
+	}
+
+	file.close();
+}
+
+// Removes all the words from the hashmap that are in the passed in file
+void removeFromHash(HashMapLinearChaining* hash_map, string filename)
+{
+	fstream file;
+	file.open(filename);
+
+	if(!file)
+	{
+		cout << "File not found \n";
+		return;
+	}
+
+	string temp;
+
+	while(file >> temp)
+	{
+		hash_map->remove(temp);
+	}
+
+	file.close();
+}
+
+// Returns the number of items in a file that don't exist in the hashmap
+int prideNonHashWords(HashMapLinearChaining* dict, string filename)
+{
+	fstream file;
+	file.open(filename);
+
+	int count = 0;
+
+	if(!file)
+	{
+		cout << "File not found \n";
+		return -1;
+	}
+
+	string temp;
+
+	while(file >> temp)
+	{	
+		if(dict->contains(temp))
+		{
+			continue;
+		}
+		else
+		{
+			count++;
+		}
+	}
+
+	file.close();
+
+	return count;
+}
+
 int main(int argc, char** atgv)
 {
+	cout << "Trie Answers: \n###########################################  \n";
+
 	// Trie portion 
-	// Trie tri;
+	Trie tri;
 
-	// // Add the words in the file to the trie
-	// tri.load("testAdd.txt");
+	// Add the words in the file to the trie
+	tri.load("testAdd.txt");
 
-	// cout << "Words in common between testAdd and testContains: \n";
+	cout << "Words in common between testAdd and testContains: \n";
 
-	// // Test which words from the file are in the trie
-	// containsFileContents(&tri, "testContains.txt");
+	// Test which words from the file are in the trie
+	containsFileContents(&tri, "testContains.txt");
 
-	// cout << "\n";
-
-
-	// cout << "Words and prefixes in common between testAdd and testContains: \n";
-
-	// containsPrefixes(&tri, "testTriePrefix.txt");
-
-	// cout << "\n";
+	cout << "\n";
 
 
-	// removeFromTrie(&tri, "testRemove.txt");
+	cout << "Words and prefixes in common between testAdd and testContains: \n";
 
-	// cout << "Trie after removal of words from testRemove \n";
+	containsPrefixes(&tri, "testTriePrefix.txt");
 
-	// tri.print();
+	cout << "\n";
+
+
+	removeFromTrie(&tri, "testRemove.txt");
+
+	cout << "Trie after removal of words from testRemove \n";
+
+	tri.print();
+
+	cout << "\n";
 
 	// Pride and prejuidice Trie 
 
-	// Trie prideTrie;
+	Trie prideTrie;
 
-	// prideTrie.load("dict.txt");
+	prideTrie.load("dict.txt");
 
-	// cout << "Number of non-dictionary entries: " << prideNonWords(&prideTrie, "prideandprejudice.txt") << "\n";
+	cout << "Number of non-dictionary entries according to trie: " << prideNonWords(&prideTrie, "prideandprejudice.txt") << "\n";
 
+	cout << "########################################### \n";
+
+	cout << "\n";
+
+	cout << "Hashmap Answers: \n########################################### \n";
 
 	// Hashmap portion
 
-	// hash<string> str_hash;
-	// string str1 = "world";
-
-	// cout << str1 << " = " << str_hash(str1) << "\n";
-
 	HashMapLinearChaining hash_map(500000);
 
-	string str1 = "Hello";
+	hash_map.loadFile("testAdd.txt");
 
-	hash_map.add(str1);
+	hash_map.printHash();
+	cout << "\n";
 
-	string str2 = "World";
+	hash_map.computeHistogram();
 
-	hash_map.add(str2);
+	containsHash(&hash_map, "testContains.txt");
 
-	string str3 = "Hello";
-	hash_map.add(str3);
+	removeFromHash(&hash_map, "testRemove.txt");
 
+	hash_map.printHash();
+	cout << "\n";
+
+	HashMapLinearChaining pride_hash(500000);
+
+	pride_hash.loadFile("dict.txt");
+
+	cout << "None dictionary words in file according to hashmap: " << prideNonHashWords(&pride_hash, "prideandprejudice.txt") << "\n";
 }
