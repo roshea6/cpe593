@@ -887,7 +887,7 @@ int main(int argc, char** atgv)
 
 	removeFromTrie(&tri, "testRemove.txt");
 
-	cout << "Trie after removal of words from testRemove \n";
+	cout << "Trie after removal of words from testRemove: \n";
 
 	tri.print();
 
@@ -913,17 +913,24 @@ int main(int argc, char** atgv)
 
 	hash_map.loadFile("testAdd.txt");
 
-	hash_map.printHash();
 	cout << "\n";
 
+	cout << "Hashmap histograms: " << "\n";
 	hash_map.computeHistogram();
 
+	cout << "\n";
+
+	cout << "Words in common between testAdd and testContains: \n";
 	containsHash(&hash_map, "testContains.txt");
+
+	cout << "\n";
 
 	removeFromHash(&hash_map, "testRemove.txt");
 
+	cout << "Words in hashmap after removal: \n";
 	hash_map.printHash();
 	cout << "\n";
+
 
 	HashMapLinearChaining pride_hash(500000);
 
