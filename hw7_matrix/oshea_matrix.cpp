@@ -69,9 +69,8 @@ public:
 	}
 
 	// Finds the pivot for a given row number and bring it to the correct place
-	void partialPivot(int i)
+	void partialPivot(int i, vector<double>& B)
 	{
-		cout << "Pivot \n";
 		int largest_row = i;
 		double largest_val = m[i*cols+i]; // Starts with th starting value as biggest val
 
@@ -94,12 +93,15 @@ public:
 				// Swap value in ith row with the value from the largest_row row
 				swap(m[i*cols+j], m[largest_row*cols+j]);
 			}
+
+			// Also swap values in the solution vector
+			swap(B[i], B[largest_row]);
 		}
 	}
 	
 	// Work from the bottom of the array up and solve for each variable then substitute it back
 	// into the rest of the array so the next variable can be solved for
-	vector<double> back_substitute(vector<double> B)
+	vector<double> back_substitute(vector<double>& B)
 	{
 		// Answer vector that will contain the value of each variable
 		vector<double> x;
@@ -107,13 +109,18 @@ public:
 
 		for(int n = rows; n > 0; n--)
 		{
+			// cout << "B[" << n-1 << "] = " << B[n-1] << "\n";
+
+			// char z;
+			// cin >> z;
+
 			// Get the value of the variable
 			x[n-1] = B[n-1]/m[(n-1)*cols+(n-1)];
 
 			// Substitute the new variable value back into the rest of the matrix
-			for(int j = n-2; j > 0; j--)
+			for(int j = n-2; j >= 0; j--)
 			{
-				B[j] -= x[n-1] * m[j*cols + n];
+				B[j] -= x[n-1] * m[j*cols + n-1];
 			}
 		}
 		return x;
@@ -121,7 +128,7 @@ public:
 
 	// Uses Gaussian elimination with partial pivoting to solve the matrix for the 
 	// passed in solution vector
-	vector<double> solve(vector<double> B)
+	vector<double> solve(vector<double>& B)
 	{
 		// Check to make its actually solvable
 		if(rows != cols)
@@ -135,13 +142,20 @@ public:
 		for(int i = 0; i < rows; i++)
 		{
 			// Find the pivot and bring it to the correct place
-			partialPivot(i);
+			partialPivot(i, B);
 			// The pivot row is now in row i
 
+			// display();
+
+			// char x;
+
+			// cin >> x;
+			
 			// Wipe out the rows below the pivot row using the pivot row
 			for(int k = i + 1; k < rows; k++)
 			{
 				double s = -m[k*cols+i]/m[i*cols+i];
+				// cout << "S = " << s << "\n";
 				m[k*cols+i] = 0; // Eliminate the ith element in row k. Directly set to 0 to avoid
 				// float accuracy problems
 
