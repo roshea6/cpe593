@@ -1,9 +1,10 @@
 /*
 	 Author: Ryan O'Shea
 
-	 Description: Matrix class with matrix mulitplication using partial pivoting
+	 Description: Matrix class with matrix solving using partial pivoting
 
-	 cite: 
+	 cite: https://web.mit.edu/10.001/Web/Course_Notes/GaussElimPivoting.html to better 
+	 udnerstand guassian elimination with partial pivoting
 
 	 "I pledge my honor that I have abided by the Stevens Honor System"
 */
@@ -109,11 +110,6 @@ public:
 
 		for(int n = rows; n > 0; n--)
 		{
-			// cout << "B[" << n-1 << "] = " << B[n-1] << "\n";
-
-			// char z;
-			// cin >> z;
-
 			// Get the value of the variable
 			x[n-1] = B[n-1]/m[(n-1)*cols+(n-1)];
 
@@ -144,12 +140,6 @@ public:
 			// Find the pivot and bring it to the correct place
 			partialPivot(i, B);
 			// The pivot row is now in row i
-
-			// display();
-
-			// char x;
-
-			// cin >> x;
 			
 			// Wipe out the rows below the pivot row using the pivot row
 			for(int k = i + 1; k < rows; k++)
@@ -203,32 +193,37 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
+	// Read in the number of rows 
 	int rows;
 
 	file >> rows;
 
-	cout << "Creating a " << rows << " x " << rows << " matrix \n";
-
+	// Create the nxn matrix
 	Matrix mat(rows, rows, 0);
 
+	// Read in the contents from the file
 	mat.read_in_file(file);
 
+	// Define the answer vector and read the contents from the file into it
 	vector<double> B;
 	B.reserve(rows);
 
 	int x;
 
-	for(int i = 0; i < 10; i ++)
+	for(int i = 0; i < rows; i ++)
 	{
 		file >> B[i];
 	}
 
+	// Solve the matrix and display the solution vector
 	vector<double> sol = mat.solve(B);
 
 	for(int i = 0; i < rows; i++)
 	{
 		cout << sol[i] << " ";
 	}
+
+	cout << "\n";
 
 	return 0;
 }
